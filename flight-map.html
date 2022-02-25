@@ -12,12 +12,13 @@
 <script>
 
   const COUNTRY = 'United States';
-  const OPACITY = 0.22;
+  const OPACITY = 1;
 
   const myGlobe = Globe()
     (document.getElementById('globeViz'))
 
-    .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
+    .backgroundColor('#EEEEEE')
+    .globeImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/earth-blue-marble.jpg')
     .pointOfView({ lat: 39.6, lng: -98.5, altitude: 2 }) // aim at continental US centroid
 
     .arcLabel(d => `${d.airline}: ${d.srcIata} &#8594; ${d.dstIata}`)
@@ -25,12 +26,11 @@
     .arcStartLng(d => +d.srcAirport.lng)
     .arcEndLat(d => +d.dstAirport.lat)
     .arcEndLng(d => +d.dstAirport.lng)
-    .arcDashLength(0.25)
-    .arcDashGap(1)
-    .arcDashInitialGap(() => Math.random())
-    .arcDashAnimateTime(4000)
-    .arcColor(d => [`rgba(0, 255, 0, ${OPACITY})`, `rgba(255, 0, 0, ${OPACITY})`])
+    .arcDashLength(1)
+    .arcDashGap(0)
+    .arcColor(d => ['#5600e0', '#9d00e0'])
     .arcsTransitionDuration(0)
+    .arcStroke(0.5)
 
     .pointColor(() => 'orange')
     .pointAltitude(0)
@@ -45,7 +45,7 @@
   Promise.all([
     fetch('https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat').then(res => res.text())
       .then(d => d3.csvParseRows(d, airportParse)),
-    fetch('https://raw.githubusercontent.com/jpatokal/openflights/master/data/routes.dat').then(res => res.text())
+    fetch('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/routes.dat').then(res => res.text())
       .then(d => d3.csvParseRows(d, routeParse))
   ]).then(([airports, routes]) => {
 
@@ -58,7 +58,6 @@
         srcAirport: byIata[d.srcIata],
         dstAirport: byIata[d.dstIata]
       }))
-      .filter(d => d.srcAirport.country === COUNTRY && d.dstAirport.country !== COUNTRY); // international routes from country
 
     myGlobe
       .pointsData(airports)
