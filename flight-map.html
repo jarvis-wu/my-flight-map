@@ -20,6 +20,7 @@
     .backgroundImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/night-sky.png')
     .globeImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/earth-marble.jpg')
     .pointOfView({ lat: 39.6, lng: -98.5, altitude: 2 }) // aim at continental US centroid
+    .atmosphereColor('#4b68ad')
 
     .arcLabel(d => `${d.airline}: ${d.srcIata} &#8594; ${d.dstIata}`)
     .arcStartLat(d => +d.srcAirport.lat)
@@ -28,9 +29,11 @@
     .arcEndLng(d => +d.dstAirport.lng)
     .arcDashLength(1)
     .arcDashGap(0)
-    .arcColor(d => ['#5600e0', '#9d00e0'])
+    .arcColor(d => ['#ff6600', '#ffbf00'])
     .arcsTransitionDuration(0)
-    .arcStroke(0.5)
+    .arcStroke(0.3)
+    .arcCurveResolution(128)
+    .arcCircularResolution(24)
 
     .pointColor(() => 'orange')
     .pointAltitude(0)
@@ -59,9 +62,14 @@
         dstAirport: byIata[d.dstIata]
       }))
 
+    const MIN_SCALE = 0.2;
+    const MAX_SCALE = 0.5;
+
     myGlobe
       .pointsData(airports)
-      .arcsData(filteredRoutes);
+      .arcsData(filteredRoutes)
+      .arcAltitudeAutoScale(() => Math.random() * (MAX_SCALE - MIN_SCALE) + MIN_SCALE);
+
   });
 </script>
 </body>
