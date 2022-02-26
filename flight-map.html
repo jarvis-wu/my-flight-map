@@ -46,7 +46,7 @@
   const routeParse = ([airline, airlineId, srcIata, srcAirportId, dstIata, dstAirportId, codeshare, stops, equipment]) => ({ airline, airlineId, srcIata, srcAirportId, dstIata, dstAirportId, codeshare, stops, equipment});
 
   Promise.all([
-    fetch('https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat').then(res => res.text())
+    fetch('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/airports.dat').then(res => res.text())
       .then(d => d3.csvParseRows(d, airportParse)),
     fetch('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/routes.dat').then(res => res.text())
       .then(d => d3.csvParseRows(d, routeParse))
@@ -61,6 +61,8 @@
         srcAirport: byIata[d.srcIata],
         dstAirport: byIata[d.dstIata]
       }))
+
+    alert(filteredRoutes.length);
 
     const MIN_SCALE = 0.2;
     const MAX_SCALE = 0.3;
