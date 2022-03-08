@@ -13,12 +13,14 @@
 
   const COUNTRY = 'United States';
   const OPACITY = 1;
+  const MIN_SCALE = 0.2;
+  const MAX_SCALE = 0.5;
 
   const myGlobe = Globe()
     (document.getElementById('globeViz'))
 
     .backgroundImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/night-sky.png')
-    .globeImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/earth-marble.jpg')
+    .globeImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/single-color.png')
     .pointOfView({ lat: 39.6, lng: -98.5, altitude: 2 }) // aim at continental US centroid
     .atmosphereColor('#4b68ad')
 
@@ -61,11 +63,6 @@
         srcAirport: byIata[d.srcIata],
         dstAirport: byIata[d.dstIata]
       }))
-
-    alert(filteredRoutes.length);
-
-    const MIN_SCALE = 0.2;
-    const MAX_SCALE = 0.3;
 
     myGlobe
       .pointsData(airports)
