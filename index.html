@@ -1,0 +1,90 @@
+<head>
+  <style> body { margin: 0; } </style>
+
+  <script src="https://unpkg.com/d3-dsv"></script>
+  <script src="https://unpkg.com/index-array-by"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
+</head>
+
+<body>
+<div id="globeViz"></div>
+
+<script>
+
+  const COUNTRY = 'United States';
+  const OPACITY = 1;
+  const MIN_SCALE = 0.2;
+  const MAX_SCALE = 0.5;
+
+  const myGlobe = Globe()
+    (document.getElementById('globeViz'))
+
+    //.backgroundImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/night-sky.png')
+    .backgroundColor('#eeeeee')
+    .globeImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/map-bg.png')
+    .pointOfView({ lat: 39.6, lng: -98.5, altitude: 2 }) // aim at continental US centroid
+    .atmosphereColor('#00000000')
+
+    .polygonCapColor(feat => '#e9e9e9')
+    .polygonSideColor(() => '#aaaaaa')
+    .polygonStrokeColor(() => '#c0c0c0')
+
+    .arcLabel(d => `${d.airline}: ${d.srcIata} &#8594; ${d.dstIata}`)
+    .arcStartLat(d => +d.srcAirport.lat)
+    .arcStartLng(d => +d.srcAirport.lng)
+    .arcEndLat(d => +d.dstAirport.lat)
+    .arcEndLng(d => +d.dstAirport.lng)
+    .arcDashLength(1)
+    .arcDashGap(0)
+    .arcColor(d => ['#ff6600', '#ffbf00'])
+    .arcsTransitionDuration(0)
+    .arcStroke(0.3)
+    .arcCurveResolution(128)
+    .arcCircularResolution(24)
+
+    .pointColor(() => 'orange')
+    .pointAltitude(0)
+    .pointRadius(0.02)
+    .pointsMerge(true);
+
+  // load data
+
+  const airportParse = ([airportId, name, city, country, iata, icao, lat, lng, alt, timezone, dst, tz, type, source]) => ({ airportId, name, city, country, iata, icao, lat, lng, alt, timezone, dst, tz, type, source });
+  const routeParse = ([airline, airlineId, srcIata, srcAirportId, dstIata, dstAirportId, codeshare, stops, equipment]) => ({ airline, airlineId, srcIata, srcAirportId, dstIata, dstAirportId, codeshare, stops, equipment});
+
+  Promise.all([
+    fetch('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/airports.dat').then(res => res.text())
+      .then(d => d3.csvParseRows(d, airportParse)),
+    fetch('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/routes.dat').then(res => res.text())
+      .then(d => d3.csvParseRows(d, routeParse))
+  ]).then(([airports, routes]) => {
+
+    const byIata = indexBy(airports, 'iata', false);
+
+    const filteredRoutes = routes
+      .filter(d => byIata.hasOwnProperty(d.srcIata) && byIata.hasOwnProperty(d.dstIata)) // exclude unknown airports
+      .filter(d => d.stops === '0') // non-stop flights only
+      .map(d => Object.assign(d, {
+        srcAirport: byIata[d.srcIata],
+        dstAirport: byIata[d.dstIata]
+      }))
+
+    myGlobe
+      .pointsData(airports)
+      .arcsData(filteredRoutes)
+      .arcAltitudeAutoScale(() => Math.random() * (MAX_SCALE - MIN_SCALE) + MIN_SCALE);
+
+  });
+
+  fetch('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/ne_110m_admin_0_countries.geojson').then(res => res.json()).then(countries => {
+    myGlobe
+      .polygonsData(countries.features.filter(d => d.properties.ISO_A2 !== 'AQ'))
+      .polygonAltitude(0.005);
+  });
+
+  setTimeout(() => { // wait for scene to be populated (asynchronously)
+    const directionalLight = myGlobe.scene().children.find(obj3d => obj3d.type === 'DirectionalLight');
+    directionalLight.visible = false;
+  });
+</script>
+</body>
