@@ -19,10 +19,11 @@
   const myGlobe = Globe()
     (document.getElementById('globeViz'))
 
-    .backgroundImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/night-sky.png')
-    .globeImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/vector-world-map.svg')
+    //.backgroundImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/night-sky.png')
+    .backgroundColor('#eeeeee')
+    .globeImageUrl('https://raw.githubusercontent.com/jarvis-wu/my-flight-map/main/gray.png')
     .pointOfView({ lat: 39.6, lng: -98.5, altitude: 2 }) // aim at continental US centroid
-    .atmosphereColor('#4b68ad')
+    //.atmosphereColor('#4b68ad')
 
     .arcLabel(d => `${d.airline}: ${d.srcIata} &#8594; ${d.dstIata}`)
     .arcStartLat(d => +d.srcAirport.lat)
