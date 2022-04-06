@@ -44,7 +44,6 @@
 
     .pointColor(() => 'rgba(255, 153, 0, 1)')
     .pointAltitude(0.003)
-    // .pointRadius(0.3)
     .pointsMerge(true)
     .pointResolution(36);
 
@@ -77,7 +76,7 @@
 
     var airportVisitCounter = {};
 
-    filteredRoutes.forEach(function (route, index)
+    filteredRoutes.forEach((route) => {
       if (airportVisitCounter[route.srcIata] === undefined) {
         airportVisitCounter[route.srcIata] = 1;
       } else {
